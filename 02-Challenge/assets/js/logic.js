@@ -3,64 +3,51 @@ const themeSwitcher = document.getElementById('toggle');
 const body = document.body;
 const container = document.querySelector('.container');
 
-let mode = 'dark';
+const savedTheme = localStorage.getItem('theme');
+let mode = savedTheme || 'dark';
 
-themeSwitcher.addEventListener('click', function () {
-  // If mode is dark, apply light background
+
+function applyTheme(mode) {
   if (mode === 'dark') {
-    mode = 'light';
-    container.setAttribute('class', 'light');
-    container.removeAttribute('class', 'dark');
-    themeSwitcher.textContent = "🌙";
+    body.classList.add('dark-mode');
+    container.classList.add('dark');
+    container.classList.remove('light');
+    themeSwitcher.textContent = "🌞"; // Icon for dark mode
+  } else {
+    body.classList.add('light-mode');
+    container.classList.add('light');
+    container.classList.remove('dark');
+    themeSwitcher.textContent = "🌙"; // Icon for light mode
   }
-  // If mode is light, apply dark background
-  else {
-    mode = 'dark';
-    container.setAttribute('class', 'dark');
-    container.removeAttribute('class', 'light');
-    themeSwitcher.textContent = "🌞";
-  }
+}
+
+// Apply the theme on page load
+applyTheme(mode);
+
+// Add click event listener to toggle the theme
+themeSwitcher.addEventListener('click', function () {
+  mode = mode === 'dark' ? 'light' : 'dark'; // Toggle mode
+  applyTheme(mode); // Apply the new mode
+  localStorage.setItem('theme', mode); // Save to localStorage
 });
 
-// Load the saved theme from localStorage
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-  body.classList.add('dark-mode');
-  toggleSwitch.classList.add('active');
-}
-
-
-
-// TODO: Create a function called `readLocalStorage` that reads from local storage and returns the data. If no data exists, return an empty array.
-
+// Function to read from localStorage
 function readLocalStorage(key) {
-  // Retrieve data from localStorage
   const data = localStorage.getItem(key);
-
-  // If data exists, parse and return it; otherwise, return an empty array
   return data ? JSON.parse(data) : [];
 }
-// TODO: Create a function called `storeLocalStorage` that takes a given object and saves the new data to the existing blog data in local storage.
+
+// Function to save data to localStorage
 function storeLocalStorage(key, newData) {
-  // Retrieve existing data from local storage
-  const existingData = localStorage.getItem(key);
-
-  // Parse existing data or initialize an empty array
-  const parsedData = existingData ? JSON.parse(existingData) : [];
-
-  // Add new data to the existing array
-  parsedData.push(newData);
-
-  // Store the updated array back into local storage
-  localStorage.setItem(key, JSON.stringify(parsedData));
+  const existingData = readLocalStorage(key); // Use the helper function to read data
+  existingData.push(newData); // Add new data
+  localStorage.setItem(key, JSON.stringify(existingData)); // Save updated data
 }
 
-// ! Use the following function whenever you need to redirect to a different page
-
+// Redirect function
 let redirectURL = '';
 
 const redirectPage = function (url) {
   redirectURL = url;
-  location.assign(url);
+  location.assign(url); // Redirect to the specified URL
 };
-
